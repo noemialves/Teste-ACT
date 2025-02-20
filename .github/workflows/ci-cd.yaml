@@ -1,0 +1,82 @@
+name: CI/CD Pipeline
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out do repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Executar Quality Gate (Action Typescript)
+        uses: ./.github/actions/quality-gate
+        with:
+          requiredFile: 'requirements.txt'
+          #se o arquivo não exetir, a action é abortada
+
+      - name: Executar testes
+        run: pytest
+
+      - name: Build da aplicação
+        run: |
+          pip install build 
+          python -m build --wheel
+
+      - name: Upload do artefato
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-app-build
+          path: dist
+
+  release-and-deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment:
+      name: teste
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v3
+
+      - name: Download do artefato
+        uses: actions/download-artifact@v3
+        with:
+          name: python-app-build
+
+      - name: Criar release no github
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: 'v1.0.${{github.run_number}}'
+          release_name: 'v1.0.${{github.run_number}}'
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Upload do artefato na release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: 'dist/python_web_app-0.1.0-py3-none-any.whl'
+          asset_name: 'python_web_app-0.1.0-py3-none-any.whl'
+          asset_content_type: 'application/actet-stream'
+          
+      - name: Deploy para ambiente de test
+        run: echo"Dploy da aplicação Python para ambiente de teste..."
