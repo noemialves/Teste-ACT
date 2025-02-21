@@ -40,6 +40,9 @@ jobs:
           pip install build 
           python -m build --wheel
 
+      - name: Listar conteúdo do diretório dist
+        run: ls -la dist
+        
       - name: Upload do artefato
         uses: actions/upload-artifact@v4
         with:
@@ -79,7 +82,7 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: 'dist/python_web_app-0.1.0-py3-none-any.whl'
           asset_name: 'python_web_app-0.1.0-py3-none-any.whl'
-          asset_content_type: 'application/actet-stream'
+          asset_content_type: 'application/octet-stream'
           
       - name: Deploy para ambiente de test
-        run: echo"Dploy da aplicação Python para ambiente de teste..."
+        run: echo"Deploy da aplicação Python para ambiente de teste..."
