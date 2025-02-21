@@ -30,7 +30,7 @@ jobs:
         uses: ./.github/actions/quality-gate
         with:
           requiredFile: 'requirements.txt'
-          #se o arquivo não exetir, a action é abortada
+          #se o arquivo não existir, a action é abortada
 
       - name: Executar testes
         run: pytest
@@ -39,9 +39,6 @@ jobs:
         run: |
           pip install build 
           python -m build --wheel
-
-      - name: Listar conteúdo do diretório dist
-        run: ls -la dist
 
       - name: Upload do artefato
         uses: actions/upload-artifact@v4
