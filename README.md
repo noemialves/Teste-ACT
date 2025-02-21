@@ -3,7 +3,7 @@
 Este repositório contém um exemplo de pipeline CI/CD configurado no GitHub Actions para uma aplicação Python simples. 
 A imagem abaixo ilustra o fluxo completo, desde o commit na branch principal até o deploy em um ambiente de teste com aprovação manual.
 
-![Fluxo do Pipeline](./ci_cd.drawio.png)
+![Fluxo do Pipeline](images/ci_cd.drawio.png)
 
 ## Visão Geral
 
